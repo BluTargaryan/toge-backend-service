@@ -2,10 +2,10 @@ import {dynamoDB }from '../config/dynamodb'
 import {v4 as uuidv4} from 'uuid'
 import {createTable} from '../config/dynamodb'
 
-const TABLE_NAME = 'Items'
+const TABLE_NAME = 'Ingredients'
 
 //create table if it does not exist
-export const createItemTable = async () => {
+export const createIngredientTable = async () => {
     
     await createTable(TABLE_NAME, 
         [{AttributeName: 'id', KeyType: 'HASH'}],
@@ -14,12 +14,12 @@ export const createItemTable = async () => {
 }
 
 //create item
-export const createItem = async (itemData:any) => {
+export const createIngredient = async (ingredientData:any) => {
    const params={
     TableName: TABLE_NAME,
     Item: {
         id: uuidv4(),
-        ...itemData,
+        ...ingredientData,
         createdAt: new Date().toISOString(),
     }
    }
@@ -28,7 +28,7 @@ export const createItem = async (itemData:any) => {
 }
 
 // Get item by ID
-export const getItemById = async (id:string) => {
+export const getIngredientById = async (id:string) => {
     const params = {
       TableName: TABLE_NAME,
       Key: { id }
@@ -39,7 +39,7 @@ export const getItemById = async (id:string) => {
   };
 
   // Get all items
-export const getAllItems = async () => {
+export const getAllIngredients = async () => {
     const params = {
       TableName: TABLE_NAME
     };
@@ -49,7 +49,7 @@ export const getAllItems = async () => {
   };
 
 // Update item
-export const updateItem = async (id:string, itemData:any) => {
+export const updateIngredient = async (id:string, ingredientData:any) => {
     const params: {
       TableName: string;
       Key: { id: string };
@@ -68,10 +68,10 @@ export const updateItem = async (id:string, itemData:any) => {
   
     let prefix = ' ';
     
-    Object.keys(itemData).forEach(key => {
+    Object.keys(ingredientData).forEach(key => {
       params.UpdateExpression += `${prefix}#${key} = :${key}`;
       params.ExpressionAttributeNames[`#${key}`] = key;
-      params.ExpressionAttributeValues[`:${key}`] = itemData[key];
+      params.ExpressionAttributeValues[`:${key}`] = ingredientData[key];
       prefix = ', ';
     });
   
@@ -84,7 +84,7 @@ export const updateItem = async (id:string, itemData:any) => {
   };
 
   // Delete item
-export const deleteItem = async (id:string) => {
+export const deleteIngredient = async (id:string) => {
     const params = {
       TableName: TABLE_NAME,
       Key: { id },
