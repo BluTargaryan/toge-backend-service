@@ -2,7 +2,6 @@ import express from "express";
 import bodyParser from "body-parser";
 import {ingredientsRouter} from "./routes/ingredients";
 import {shopsRouter} from "./routes/shops";
-import {config} from "dotenv";
 
 const app = express();
 const port = process.env.PORT || 3000;
