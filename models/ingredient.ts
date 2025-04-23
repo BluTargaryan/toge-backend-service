@@ -15,16 +15,27 @@ export const createIngredientTable = async () => {
 
 //create item
 export const createIngredient = async (ingredientData:any) => {
-   const params={
+   if (!ingredientData || !ingredientData.title) {
+     throw new Error('Title is required');
+   }
+
+   const params = {
     TableName: TABLE_NAME,
     Item: {
         id: uuidv4(),
         ...ingredientData,
+        title: ingredientData.title.toLowerCase().trim(),
         createdAt: new Date().toISOString(),
     }
    }
-   await dynamoDB.put(params).promise()
-   return params.Item
+
+   try {
+     await dynamoDB.put(params).promise();
+     return params.Item;
+   } catch (error) {
+     console.error('Error creating ingredient:', error);
+     throw new Error('Failed to create ingredient');
+   }
 }
 
 // Get item by ID
@@ -37,6 +48,34 @@ export const getIngredientById = async (id:string) => {
     const result = await dynamoDB.get(params).promise();
     return result.Item;
   };
+
+  // Get item by title
+export const getIngredientByTitle = async (title:string) => {
+  if (!title) {
+    throw new Error('Title is required');
+  }
+
+  const searchTerm = title.toLowerCase().trim();
+  
+  const params = {
+    TableName: TABLE_NAME,
+    FilterExpression: 'contains(#title, :title)',
+    ExpressionAttributeNames: {
+      '#title': 'title'
+    },
+    ExpressionAttributeValues: {
+      ':title': searchTerm
+    }
+  };
+
+  try {
+    const result = await dynamoDB.scan(params).promise();
+    return result.Items || [];
+  } catch (error) {
+    console.error('Error searching for ingredient:', error);
+    throw new Error('Failed to search for ingredient');
+  }
+};
 
   // Get all items
 export const getAllIngredients = async () => {

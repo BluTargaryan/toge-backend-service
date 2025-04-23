@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createIngredientTable, createIngredient, deleteIngredient, getAllIngredients, getIngredientById, updateIngredient } from '../models/ingredient';
+import { createIngredientTable, createIngredient, deleteIngredient, getAllIngredients, getIngredientById, updateIngredient, getIngredientByTitle } from '../models/ingredient';
 
 export const ingredientsRouter = Router();
 
@@ -39,6 +39,15 @@ ingredientsRouter.post('/', async (req, res) => {
     }
   });
 
+  // Get user by title
+  ingredientsRouter.get('/title/:title', async (req, res) => {
+    try {
+      const ingredient = await getIngredientByTitle(req.params.title);
+      res.json(ingredient);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
   // Update user
 ingredientsRouter.put('/:id', async (req, res) => {
     try {
