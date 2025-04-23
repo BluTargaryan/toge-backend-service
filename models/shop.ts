@@ -19,6 +19,8 @@ export const createShop = async (shopData:any) => {
     TableName: TABLE_NAME,
     Item: {
         id: uuidv4(),
+        title: shopData.title.toLowerCase().trim(),
+        locationTitle: shopData.locationTitle.toLowerCase().trim(),
         ...shopData,
         createdAt: new Date().toISOString(),
     }
@@ -37,6 +39,34 @@ export const getShopById = async (id:string) => {
     const result = await dynamoDB.get(params).promise();
     return result.Item;
   };
+
+  // Get item by title
+export const getShopByLocation = async (location:string) => {
+  if (!location) {
+    throw new Error('Location is required');
+  }
+
+  const searchTerm = location.toLowerCase().trim();
+  
+  const params = {
+    TableName: TABLE_NAME,
+    FilterExpression: 'contains(#locationTitle, :locationTitle)',
+    ExpressionAttributeNames: {
+      '#locationTitle': 'locationTitle'
+    },
+    ExpressionAttributeValues: {
+      ':locationTitle': searchTerm
+    }
+  };
+
+  try {
+    const result = await dynamoDB.scan(params).promise();
+    return result.Items;
+  } catch (error) {
+    console.error('Error fetching shop by location:', error);
+    throw error;
+  }
+}
 
   // Get all items
 export const getAllShops = async () => {
