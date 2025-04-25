@@ -1,7 +1,22 @@
-import { Router } from 'express';
+import { NextFunction, Router, Request, Response } from 'express';
 import { createShopTable, createShop, deleteShop, getAllShops, getShopById, updateShop } from '../models/shop';
 
 export const shopsRouter = Router();
+
+
+// Access code validation middleware
+const validateAccessCode = (req: Request, res: Response, next: NextFunction) => {
+  const accessCode = req.query.acode;
+  
+  if (!accessCode || accessCode !== process.env.USER_ACCESS_KEY) {
+    return res.status(401).json({ error: 'Invalid or missing access code' });
+  }
+  
+  next();
+};
+
+// Apply middleware to all routes
+shopsRouter.use(validateAccessCode);
 
 //init item table
 createShopTable().catch(console.error)

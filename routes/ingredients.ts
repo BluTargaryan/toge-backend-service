@@ -1,7 +1,21 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { createIngredientTable, createIngredient, deleteIngredient, getAllIngredients, getIngredientById, updateIngredient, getIngredientByTitle } from '../models/ingredient';
 
 export const ingredientsRouter = Router();
+
+// Access code validation middleware
+const validateAccessCode = (req: Request, res: Response, next: NextFunction) => {
+  const accessCode = req.query.acode;
+  
+  if (!accessCode || accessCode !== process.env.USER_ACCESS_KEY) {
+    return res.status(401).json({ error: 'Invalid or missing access code' });
+  }
+  
+  next();
+};
+
+// Apply middleware to all routes
+ingredientsRouter.use(validateAccessCode);
 
 //init item table
 createIngredientTable().catch(console.error)
@@ -48,8 +62,9 @@ ingredientsRouter.post('/', async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   });
+
   // Update user
-ingredientsRouter.put('/:id', async (req, res) => {
+  ingredientsRouter.put('/:id', async (req, res) => {
     try {
       const ingredient = await updateIngredient(req.params.id, req.body);
       if (!ingredient) {
