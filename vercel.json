@@ -6,9 +6,10 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
+  "headers": [
+
     {
-      "src": "/(.*)",
+      "source": "/(.*)",
       "dest": "app.ts",
       "headers": [
         { "key": "Access-Control-Allow-Credentials", "value": "true" },
